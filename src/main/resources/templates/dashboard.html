@@ -1,0 +1,635 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080D18">
+    <title>Dashboard | JavaQuest</title>
+
+    <script>
+        try {
+            document.documentElement.dataset.theme =
+                localStorage.getItem("javaquest-theme") === "light"
+                    ? "light" : "dark";
+        } catch (e) {}
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <script src="/theme.js" defer></script>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #080D18;
+            --sidebar: #0B1220;
+            --panel: #111C30;
+            --panel-hover: #17243B;
+            --border: #263750;
+            --blue: #438BFF;
+            --blue-hover: #2F75E8;
+            --blue-soft: #14284B;
+            --text: #F5F7FC;
+            --muted: #9CAAC0;
+            --shadow: 0 12px 32px rgba(0,0,0,.14);
+        }
+
+        html[data-theme="light"] {
+            color-scheme: light;
+            --bg: #F4F7FC;
+            --sidebar: #FFFFFF;
+            --panel: #FFFFFF;
+            --panel-hover: #EDF3FC;
+            --border: #DCE3ED;
+            --blue: #246BFD;
+            --blue-hover: #1858D9;
+            --blue-soft: #E4EDFF;
+            --text: #172033;
+            --muted: #64748B;
+            --shadow: 0 12px 32px rgba(25,45,80,.06);
+        }
+
+        * { box-sizing: border-box; }
+
+        html { min-height: 100%; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            transition: background-color .2s, color .2s;
+        }
+
+        button, input, select, textarea { font: inherit; }
+        a { color: inherit; text-decoration: none; }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            padding: 30px 20px;
+            border-right: 1px solid var(--border);
+            background: var(--sidebar);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin: 0 0 42px 8px;
+        }
+
+        .brand span { color: var(--blue); }
+
+        .nav-label {
+            margin: 25px 10px 12px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin: 5px 0;
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 14px;
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--blue-soft);
+            color: var(--blue);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--panel);
+        }
+
+        .sidebar-bottom p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .eyebrow {
+            color: var(--blue);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 30px clamp(20px, 4vw, 54px);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 42px;
+        }
+
+        .breadcrumb {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Compact dark/light switch */
+        .theme-toggle {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            padding: 3px;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--panel-hover);
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background .2s, border-color .2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--blue);
+        }
+
+        .toggle-knob {
+            position: absolute;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            transition: transform .2s ease;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 5px;
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        html[data-theme="light"] .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        html[data-theme="light"] .toggle-icon {
+            left: 7px;
+            right: auto;
+        }
+
+        .theme-toggle:focus-visible,
+        .account summary:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 3px;
+        }
+
+        .account { position: relative; }
+
+        .account summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            color: var(--text);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .account summary::-webkit-details-marker { display: none; }
+
+        .menu {
+            position: absolute;
+            z-index: 10;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 175px;
+            padding: 7px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .menu a {
+            display: block;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .menu a:hover { background: var(--panel-hover); }
+
+        .welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            margin: 12px 0;
+            font-size: clamp(29px, 4vw, 42px);
+            letter-spacing: -1.5px;
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 19px;
+            border: 1px solid var(--blue);
+            border-radius: 10px;
+            background: var(--blue);
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: background .2s, transform .2s;
+        }
+
+        .button:hover {
+            background: var(--blue-hover);
+            border-color: var(--blue-hover);
+            color: #FFFFFF;
+            transform: translateY(-1px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 34px;
+        }
+
+        .stat {
+            min-width: 0;
+            padding: 23px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            transition: border-color .2s, transform .2s;
+        }
+
+        .stat:hover {
+            border-color: var(--blue);
+            transform: translateY(-2px);
+        }
+
+        .stat-label, .latest-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .stat-value {
+            margin: 18px 0 8px;
+            font-size: 35px;
+            font-weight: 750;
+            letter-spacing: -1px;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-note {
+            color: var(--blue);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 0;
+            letter-spacing: -.3px;
+        }
+
+        .panel {
+            padding: 25px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .latest-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .latest-label { margin-bottom: 10px; }
+
+        .latest-score {
+            font-size: 28px;
+            font-weight: 750;
+        }
+
+        .score-tag {
+            padding: 9px 13px;
+            border-radius: 10px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .quick-card {
+            display: block;
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--panel);
+            transition: background .2s, border-color .2s, transform .2s;
+        }
+
+        .quick-card:hover {
+            background: var(--panel-hover);
+            border-color: var(--blue);
+            transform: translateY(-2px);
+        }
+
+        .quick-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 20px;
+        }
+
+        .quick-card h3 {
+            font-size: 16px;
+            margin: 19px 0 8px;
+        }
+
+        .quick-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        footer {
+            padding: 30px 0 5px;
+            color: var(--muted);
+            font-size: 11px;
+            text-align: center;
+        }
+
+        @media (max-width: 1000px) {
+            .sidebar { width: 210px; }
+            .stats { gap: 12px; }
+            .stat { padding: 18px; }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar { width: 180px; padding: 24px 12px; }
+            .main { padding: 24px 20px; }
+            .stats { grid-template-columns: 1fr; }
+            .welcome { align-items: flex-start; flex-direction: column; }
+        }
+
+        @media (max-width: 560px) {
+            .layout { display: block; }
+            .sidebar {
+                width: 100%;
+                padding: 18px;
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+            }
+            .brand { margin: 0 0 18px; }
+            .nav-label, .sidebar-bottom { display: none; }
+            .nav-link {
+                display: inline-flex;
+                padding: 10px;
+                margin: 0 3px 0 0;
+                font-size: 12px;
+            }
+            .main { padding: 22px 16px; }
+            .topbar { margin-bottom: 30px; }
+            .topbar-actions { gap: 7px; }
+            .breadcrumb { font-size: 12px; }
+            .account summary { padding: 9px; max-width: 175px; overflow: hidden; text-overflow: ellipsis; }
+            .quick-grid { grid-template-columns: 1fr; }
+            .panel { padding: 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">Java<span>Quest</span> ✦</div>
+
+        <div class="nav-label">Workspace</div>
+        <a class="nav-link active" th:href="@{/dashboard}">◈ Dashboard</a>
+        <a class="nav-link" th:href="@{/quiz}">◎ Take a quiz</a>
+        <a class="nav-link" th:href="@{/history}">◷ Quiz history</a>
+        <a class="nav-link" th:href="@{/leaderboard}">🏆 Leaderboard</a>
+
+        <div class="nav-label">Account</div>
+        <a class="nav-link" th:href="@{/logout}">↗ Sign out</a>
+
+        <div class="sidebar-bottom">
+            <div class="eyebrow">Keep learning</div>
+            <p>Small steps every day lead to stronger programming skills.</p>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="breadcrumb">Workspace / Dashboard</div>
+
+            <div class="topbar-actions">
+                <button type="button" class="theme-toggle"
+                        aria-label="Switch to light mode"
+                        aria-pressed="true">
+                    <span class="toggle-icon" aria-hidden="true">☾</span>
+                    <span class="toggle-knob" aria-hidden="true"></span>
+                </button>
+
+                <details class="account">
+                    <summary>
+                        ◉ <span th:text="${username}">Student</span> ▾
+                    </summary>
+                    <nav class="menu">
+                        <a th:href="@{/dashboard}">Dashboard</a>
+                        <a th:href="@{/quiz}">Take a quiz</a>
+                        <a th:href="@{/history}">Quiz history</a>
+                        <a th:href="@{/leaderboard}">Leaderboard</a>
+                        <a th:href="@{/logout}">Sign out</a>
+                    </nav>
+                </details>
+            </div>
+        </div>
+
+        <section class="welcome">
+            <div>
+                <div class="eyebrow">Your learning space</div>
+                <h1>Welcome back, <span th:text="${username}">Student</span>.</h1>
+                <p class="subtitle">
+                    Every question is a chance to improve. Ready for your next challenge?
+                </p>
+            </div>
+            <a class="button" th:href="@{/quiz}">Start a quiz <span>→</span></a>
+        </section>
+
+        <section class="stats">
+            <article class="stat">
+                <div class="stat-label">Total attempts</div>
+                <div class="stat-value" th:text="${totalAttempts}">0</div>
+                <div class="stat-note">Keep building your streak</div>
+            </article>
+
+            <article class="stat">
+                <div class="stat-label">Best score</div>
+                <div class="stat-value">
+                    <span th:text="${bestPercentage}">0</span><span>%</span>
+                </div>
+                <div class="stat-note">Your personal best</div>
+            </article>
+
+            <article class="stat">
+                <div class="stat-label">Average score</div>
+                <div class="stat-value">
+                    <span th:text="${averagePercentage}">0</span><span>%</span>
+                </div>
+                <div class="stat-note">Across all attempts</div>
+            </article>
+        </section>
+
+        <div class="section-heading">
+            <h2>Recent performance</h2>
+            <a th:href="@{/history}" class="subtitle">View history →</a>
+        </div>
+
+        <section class="panel">
+            <div th:if="${latestAttempt != null}" class="latest-row">
+                <div>
+                    <div class="latest-label">Latest quiz result</div>
+                    <div class="latest-score">
+                        <span th:text="${latestAttempt.score}">0</span>
+                        <span style="color:var(--muted);font-size:18px">
+                            / <span th:text="${latestAttempt.total}">10</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="score-tag">
+                    <span th:text="${latestAttempt.percentage}">0</span>% score
+                </div>
+            </div>
+
+            <div th:if="${latestAttempt == null}">
+                <div class="eyebrow">Your journey starts here</div>
+                <h2 style="margin:12px 0">No quiz attempts yet</h2>
+                <p class="subtitle">Take your first quiz to see your performance here.</p>
+                <a class="button" th:href="@{/quiz}">Take your first quiz →</a>
+            </div>
+        </section>
+
+        <section class="panel" style="margin-top:22px;padding:22px;border:1px solid var(--border);border-radius:16px;background:var(--panel)">
+            <h2>🏅 Achievements <span th:text="${achievementCount}">0</span></h2>
+            <p class="subtitle" th:if="${#lists.isEmpty(achievements)}">Complete quizzes to unlock your first achievement.</p>
+            <ul><li th:each="achievement : ${achievements}" th:text="${achievement}">Achievement</li></ul>
+        </section>
+
+        <div class="section-heading">
+            <h2>Continue learning</h2>
+        </div>
+
+        <section class="quick-grid">
+            <a class="quick-card" th:href="@{/quiz}">
+                <div class="quick-icon">✎</div>
+                <h3>Practice questions</h3>
+                <p>Challenge your understanding and strengthen your programming fundamentals.</p>
+            </a>
+
+            <a class="quick-card" th:href="@{/history}">
+                <div class="quick-icon">↗</div>
+                <h3>Track your progress</h3>
+                <p>Review previous attempts and see how your scores develop over time.</p>
+            </a>
+        </section>
+
+        <footer>JavaQuest · Learn consistently. Improve confidently.</footer>
+    </main>
+</div>
+</body>
+</html>

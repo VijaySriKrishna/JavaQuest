@@ -1,0 +1,19 @@
+JavaQuest Question Bank
+========================
+Categories: 12
+Difficulties: Easy, Medium, Hard
+Questions per category/difficulty: 100
+Total questions: 3600
+
+Java Basics: Easy=100, Medium=100, Hard=100
+Data Types: Easy=100, Medium=100, Hard=100
+Operators: Easy=100, Medium=100, Hard=100
+Control Flow: Easy=100, Medium=100, Hard=100
+Arrays and Strings: Easy=100, Medium=100, Hard=100
+OOP: Easy=100, Medium=100, Hard=100
+Inheritance: Easy=100, Medium=100, Hard=100
+Exceptions: Easy=100, Medium=100, Hard=100
+Collections: Easy=100, Medium=100, Hard=100
+File Handling: Easy=100, Medium=100, Hard=100
+Threads: Easy=100, Medium=100, Hard=100
+Java Features: Easy=100, Medium=100, Hard=100

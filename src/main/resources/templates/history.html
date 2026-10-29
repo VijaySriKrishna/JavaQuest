@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080D18">
+    <title>Quiz History | JavaQuest</title>
+
+    <script>
+        try {
+            document.documentElement.dataset.theme =
+                localStorage.getItem("javaquest-theme") === "light"
+                    ? "light" : "dark";
+        } catch (e) {}
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <script src="/theme.js" defer></script>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #080D18;
+            --sidebar: #0B1220;
+            --panel: #111C30;
+            --panel-hover: #17243B;
+            --border: #263750;
+            --blue: #438BFF;
+            --blue-hover: #2F75E8;
+            --blue-soft: #14284B;
+            --text: #F5F7FC;
+            --muted: #9CAAC0;
+            --shadow: 0 12px 32px rgba(0,0,0,.14);
+        }
+
+        html[data-theme="light"] {
+            color-scheme: light;
+            --bg: #F4F7FC;
+            --sidebar: #FFFFFF;
+            --panel: #FFFFFF;
+            --panel-hover: #EDF3FC;
+            --border: #DCE3ED;
+            --blue: #246BFD;
+            --blue-hover: #1858D9;
+            --blue-soft: #E4EDFF;
+            --text: #172033;
+            --muted: #64748B;
+            --shadow: 0 12px 32px rgba(25,45,80,.06);
+        }
+
+        * { box-sizing: border-box; }
+        html { min-height: 100%; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            transition: background-color .2s, color .2s;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .page {
+            width: min(100% - 48px, 1000px);
+            margin: 0 auto;
+            padding: 30px 0 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .brand span { color: var(--blue); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Same toggle as dashboard.html */
+        .theme-toggle {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            padding: 3px;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--panel-hover);
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background .2s, border-color .2s;
+        }
+
+        .theme-toggle:hover { border-color: var(--blue); }
+
+        .toggle-knob {
+            position: absolute;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            transition: transform .2s ease;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 5px;
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        html[data-theme="light"] .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        html[data-theme="light"] .toggle-icon {
+            left: 7px;
+            right: auto;
+        }
+
+        .theme-toggle:focus-visible,
+        .account summary:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 3px;
+        }
+
+        .account { position: relative; }
+
+        .account summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .account summary::-webkit-details-marker { display: none; }
+
+        .menu {
+            position: absolute;
+            z-index: 10;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 175px;
+            padding: 7px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .menu a {
+            display: block;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .menu a:hover { background: var(--panel-hover); }
+
+        .eyebrow {
+            color: var(--blue);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 12px 0;
+            font-size: clamp(28px, 4vw, 38px);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .panel {
+            margin-top: 26px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 16px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        tbody tr:hover { background: var(--panel-hover); }
+        tbody tr:last-child td { border-bottom: 0; }
+
+        .score-tag {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .empty-state {
+            padding: 24px 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 17px;
+            border: 1px solid var(--blue);
+            border-radius: 10px;
+            background: var(--blue);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background .2s, transform .2s;
+        }
+
+        .button:hover {
+            background: var(--blue-hover);
+            border-color: var(--blue-hover);
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            color: var(--text);
+            background: var(--panel-hover);
+            border-color: var(--border);
+        }
+
+        .button.secondary:hover { border-color: var(--blue); }
+
+        @media (max-width: 600px) {
+            .page { width: calc(100% - 32px); padding-top: 22px; }
+            .panel { padding: 17px; }
+            .header-actions { gap: 8px; }
+            .account summary { padding: 9px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+    <header class="topbar">
+        <a class="brand" th:href="@{/dashboard}">
+            Java<span>Quest</span> ✦
+        </a>
+
+        <div class="header-actions">
+            <button type="button" class="theme-toggle"
+                    aria-label="Switch to light mode"
+                    aria-pressed="true">
+                <span class="toggle-icon" aria-hidden="true">☾</span>
+                <span class="toggle-knob" aria-hidden="true"></span>
+            </button>
+
+            <details class="account">
+                <summary>
+                    ◉ <span th:text="${username}">Student</span> ▾
+                </summary>
+                <nav class="menu">
+                    <a th:href="@{/dashboard}">Dashboard</a>
+                    <a th:href="@{/quiz}">Take a quiz</a>
+                    <a th:href="@{/history}">Quiz history</a>
+                    <a th:href="@{/logout}">Sign out</a>
+                </nav>
+            </details>
+        </div>
+    </header>
+
+    <div class="eyebrow">Your progress</div>
+    <h1>Your quiz history</h1>
+    <p class="subtitle">Every saved attempt for your account.</p>
+
+    <main class="panel">
+        <p class="empty-state" th:if="${#lists.isEmpty(attempts)}">
+            No attempts yet. Take your first quiz to start tracking your progress!
+        </p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(attempts)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Date and time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a, stat : ${attempts}">
+                    <td th:text="${stat.count}">1</td>
+                    <td>
+                        <span th:text="${a.score}">0</span> /
+                        <span th:text="${a.total}">10</span>
+                    </td>
+                    <td>
+                        <span class="score-tag">
+                            <span th:text="${a.percentage}">0</span>%
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(a.attemptedAt, 'dd MMM yyyy, hh:mm a')}">
+                        13 Oct 2026, 08:30 PM
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="buttons">
+            <a class="button" th:href="@{/dashboard}">← Back to dashboard</a>
+            <a class="button secondary" th:href="@{/quiz}">Take another quiz →</a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

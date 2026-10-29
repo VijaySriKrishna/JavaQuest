@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | JavaQuest</title>
+
+    <script>
+        try {
+            document.documentElement.dataset.theme =
+                localStorage.getItem("javaquest-theme") === "light"
+                    ? "light" : "dark";
+        } catch (e) {}
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <script src="/theme.js" defer></script>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #080D18;
+            --panel: #111C30;
+            --field: #0B1425;
+            --border: #263750;
+            --blue: #438BFF;
+            --blue-hover: #2F75E8;
+            --text: #F5F7FC;
+            --muted: #9CAAC0;
+            --error-bg: #351C29;
+            --error: #FF9AAE;
+            --shadow: 0 20px 60px rgba(0,0,0,.22);
+        }
+
+        html[data-theme="light"] {
+            color-scheme: light;
+            --bg: #F4F7FC;
+            --panel: #FFFFFF;
+            --field: #F8FAFE;
+            --border: #DCE3ED;
+            --blue: #246BFD;
+            --blue-hover: #1858D9;
+            --text: #172033;
+            --muted: #64748B;
+            --error-bg: #FFF0F2;
+            --error: #B4233D;
+            --shadow: 0 20px 60px rgba(25,45,80,.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 28px;
+            display: grid;
+            place-items: center;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            transition: background .2s, color .2s;
+        }
+
+        .page { width: 100%; max-width: 440px; }
+
+        .topbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 18px;
+        }
+
+        .theme-toggle {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            padding: 3px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--panel);
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .toggle-knob {
+            position: absolute;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            transition: transform .2s;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 5px;
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        html[data-theme="light"] .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        html[data-theme="light"] .toggle-icon {
+            left: 7px;
+            right: auto;
+        }
+
+        .theme-toggle:focus-visible,
+        input:focus-visible,
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 3px;
+        }
+
+        .card {
+            padding: 38px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .brand {
+            margin: 0;
+            text-align: center;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -1.3px;
+        }
+
+        .brand span { color: var(--blue); }
+
+        .tagline {
+            margin: 12px 0 30px;
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .field { margin-bottom: 19px; }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            background: var(--field);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input::placeholder { color: var(--muted); opacity: .8; }
+
+        input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 15%, transparent);
+        }
+
+        .hint {
+            display: block;
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .error {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border: 1px solid var(--error);
+            border-radius: 10px;
+            background: var(--error-bg);
+            color: var(--error);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .submit {
+            width: 100%;
+            margin-top: 5px;
+            padding: 14px;
+            border: 1px solid var(--blue);
+            border-radius: 11px;
+            background: var(--blue);
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .submit:hover {
+            background: var(--blue-hover);
+            border-color: var(--blue-hover);
+            transform: translateY(-1px);
+        }
+
+        .footer-note {
+            margin: 22px 0 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .switch-page {
+            margin-top: 22px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .switch-page a {
+            color: var(--blue);
+            font-weight: 600;
+        }
+
+        .switch-page a:hover { text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            body { padding: 18px; }
+            .card { padding: 28px 22px; }
+            .brand { font-size: 27px; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <div class="topbar">
+            <button type="button" class="theme-toggle"
+                    aria-label="Switch to light mode"
+                    aria-pressed="true">
+                <span class="toggle-icon" aria-hidden="true">☾</span>
+                <span class="toggle-knob" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <section class="card">
+            <h1 class="brand">Java<span>Quest</span></h1>
+            <p class="tagline">Create your account and start learning Java.</p>
+
+            <div class="error" th:if="${error}" th:text="${error}"></div>
+
+            <form th:action="@{/register}" method="post">
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input id="username" name="username"
+                           type="text" minlength="3"
+                           placeholder="Choose a username"
+                           autocomplete="username" required>
+                    <small class="hint">At least 3 characters.</small>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email address</label>
+                    <input id="email" name="email" type="email"
+                           placeholder="Enter your email address"
+                           autocomplete="email" maxlength="254" required>
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password"
+                           type="password" minlength="6"
+                           placeholder="Create a password"
+                           autocomplete="new-password" required>
+                    <small class="hint">At least 6 characters.</small>
+                </div>
+
+                <div class="field">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input id="confirmPassword" name="confirmPassword"
+                           type="password" minlength="6"
+                           placeholder="Enter your password again"
+                           autocomplete="new-password" required>
+                </div>
+
+                <button class="submit" type="submit">
+                    Create Account →
+                </button>
+            </form>
+
+            <p class="footer-note">Your next step in Java starts here.</p>
+
+            <p class="switch-page">
+                Already have an account?
+                <a th:href="@{/login}">Sign in</a>
+            </p>
+        </section>
+    </main>
+</body>
+</html>

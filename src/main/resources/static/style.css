@@ -1,0 +1,132 @@
+
+/* JavaQuest — Shared theme */
+
+:root {
+    --accent: #438BFF;
+    --accent-hover: #2F75E8;
+    --bg: #080D18;
+    --surface: #111C30;
+    --surface-hover: #17243B;
+    --text: #F5F7FC;
+    --muted: #9CAAC0;
+    --border: #263750;
+    --input-bg: #0C1423;
+    --shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    --radius: 14px;
+}
+
+html[data-theme="light"] {
+    --bg: #F4F7FC;
+    --surface: #FFFFFF;
+    --surface-hover: #EDF3FC;
+    --text: #172033;
+    --muted: #64748B;
+    --border: #DCE3ED;
+    --input-bg: #FFFFFF;
+    --shadow: 0 12px 32px rgba(25, 45, 80, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    background: var(--bg);
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
+
+h1, h2, h3, h4, p, label, a, button, input, select, textarea {
+    font-family: "Inter", sans-serif;
+}
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    letter-spacing: -0.025em;
+}
+
+p, label {
+    color: var(--muted);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+button, .btn, input[type="submit"] {
+    background: var(--accent);
+    color: #FFFFFF;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+button:hover, .btn:hover, input[type="submit"]:hover {
+    background: var(--accent-hover);
+}
+
+input:not([type="radio"]):not([type="checkbox"]),
+select, textarea {
+    width: 100%;
+    background: var(--input-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(67, 139, 255, 0.15);
+}
+
+.card, .panel, .stat-card {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 13px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.theme-toggle:hover {
+    background: var(--surface-hover);
+}
